@@ -1152,8 +1152,10 @@
             canvasWidth = window.innerWidth;
             canvasHeight = window.innerHeight;
             resizeCanvas(canvasWidth, canvasHeight);
-            player.x = canvasWidth / 2;
-            player.y = canvasHeight * PLAYER_Y_RATIO;
+            if (player) {
+                player.x = canvasWidth / 2;
+                player.y = canvasHeight * PLAYER_Y_RATIO;
+            }
         }
 
         // Draw a standard explosion sprite
