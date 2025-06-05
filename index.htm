@@ -171,7 +171,24 @@
     <script>
         // === GLOBAL LAYOUT CONSTANTS ===
         // Adjust these to tune layout easily
-        const PLAYER_Y_RATIO = .75; // 0.90 = near bottom, 0.5 = middle, 0.1 = near top
+        const PLAYER_Y_RATIO = 0.85; // 0.90 = near bottom, 0.5 = middle, 0.1 = near top
+        // === ENEMY/WAVE CONFIGURATION ===
+        // Set the number of bad guys needed to complete each wave here:
+        const BAD_GUYS_PER_WAVE = [
+            25, // Wave 1
+            30, // Wave 2
+            35, // Wave 3
+            40, // Wave 4
+            45, // Wave 5
+            50, // Wave 6
+            55, // Wave 7
+            60, // Wave 8
+            65, // Wave 9
+            70, // Wave 10
+            75, // Wave 11
+            80, // Wave 12
+            85  // Wave 13+
+        ];
         // (You could add BUTTON_SIZE, MARGIN, etc. here for further tuning)
         
         // Game state
@@ -190,6 +207,7 @@
         let enemiesKilled = 0;
         let enemiesNeededForWave = 25;
         let hitTimer = 0;
+        let enemiesSpawnedThisWave = 0;
         
         // Controls
         let leftPressed = false;
@@ -668,13 +686,18 @@
         function nextWave() {
             wave++;
             enemiesKilled = 0;
-            enemiesNeededForWave = 25 + (wave - 1) * 10;
+            // Set enemiesNeededForWave from BAD_GUYS_PER_WAVE, or use last value if wave > array length
+            enemiesNeededForWave = BAD_GUYS_PER_WAVE[Math.min(wave - 1, BAD_GUYS_PER_WAVE.length - 1)];
+            enemiesSpawnedThisWave = 0;
             startWave();
         }
         
         function startWave() {
             // Clear all enemies from the screen for the new wave
             enemies = [];
+            // Set enemiesNeededForWave for the first wave as well
+            enemiesNeededForWave = BAD_GUYS_PER_WAVE[Math.min(wave - 1, BAD_GUYS_PER_WAVE.length - 1)];
+            enemiesSpawnedThisWave = 0;
             let announcements = [
                 "PRIVACY BREACH DETECTED!",
                 "DATA QUALITY CRISIS!",
@@ -690,7 +713,7 @@
                 "UNKNOWN OWNERS!",
                 "FULL SCALE DATA DISASTER!"
             ];
-            waveAnnouncement = announcements[min(wave - 1, announcements.length - 1)];
+            waveAnnouncement = announcements[Math.min(wave - 1, announcements.length - 1)];
             gameState = 'waveAnnounce';
             waveTimer = 180;
         }
@@ -710,6 +733,8 @@
         }
         
         function spawnEnemy() {
+            // Only spawn if we haven't reached the limit for this wave
+            if (enemiesSpawnedThisWave >= enemiesNeededForWave) return;
             let typeObj;
             if (wave === 1) {
                 typeObj = ENEMY_TYPES[0]; // pii
@@ -748,6 +773,7 @@
                 speed: random(1, 2) + wave * 0.3,
                 points: typeObj.points
             });
+            enemiesSpawnedThisWave++;
         }
         
         function createExplosion(x, y, enemyType) {
