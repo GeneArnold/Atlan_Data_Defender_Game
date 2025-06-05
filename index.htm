@@ -223,7 +223,7 @@
             canvas.parent('gameContainer');
             player = {
                 x: canvasWidth / 2,
-                y: canvasHeight - canvasHeight * 0.32,
+                y: canvasHeight * 0.68,
                 width: 40,
                 height: 30,
                 speed: 4
@@ -620,7 +620,7 @@
             if (hitTimer <= 0) {
                 gameState = 'playing';
                 player.x = canvasWidth / 2;
-                player.y = canvasHeight - canvasHeight * 0.32;
+                player.y = canvasHeight * 0.68;
             }
         }
         
@@ -942,7 +942,7 @@
                     enemies = [];
                     particles = [];
                     player.x = canvasWidth / 2;
-                    player.y = canvasHeight - canvasHeight * 0.32;
+                    player.y = canvasHeight * 0.68;
                     invulnerableTimer = 0;
                     gameOverTimer = 0;
                     gameState = 'playing';
@@ -983,7 +983,7 @@
                 enemies = [];
                 particles = [];
                 player.x = canvasWidth / 2;
-                player.y = canvasHeight - canvasHeight * 0.32;
+                player.y = canvasHeight * 0.68;
                 invulnerableTimer = 0;
                 gameOverTimer = 0;
                 gameState = 'title';
@@ -996,7 +996,7 @@
             canvasHeight = window.innerHeight;
             resizeCanvas(canvasWidth, canvasHeight);
             player.x = canvasWidth / 2;
-            player.y = canvasHeight - canvasHeight * 0.32;
+            player.y = canvasHeight * 0.68;
         }
     </script>
 </body>
