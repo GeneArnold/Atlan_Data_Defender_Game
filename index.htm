@@ -172,7 +172,7 @@
     <script>
         // === GLOBAL LAYOUT CONSTANTS ===
         // Adjust these to tune layout easily
-        const GAME_VERSION = '1.1.1'; // Game version number (Atlan SVG logo on title screen)
+        const GAME_VERSION = '1.1.2'; // Game version number (local SVG, logo width = 2x DATA DEFENDER text)
         const PLAYER_Y_RATIO = 0.75; // 0.90 = near bottom, 0.5 = middle, 0.1 = near top
         // === ENEMY/WAVE CONFIGURATION ===
         // Set the number of bad guys needed to complete each wave here:
@@ -268,7 +268,7 @@
         let atlanLogoImg;
         
         function preload() {
-            atlanLogoImg = loadImage('https://upload.wikimedia.org/wikipedia/commons/1/1e/Atlan-logo-full.svg');
+            atlanLogoImg = loadImage('images/atlan-logo-full.svg');
         }
         
         function setup() {
@@ -704,8 +704,10 @@
             }
             // Draw Atlan SVG logo centered above DATA DEFENDER
             if (atlanLogoImg) {
-                let logoW = 120;
-                let logoH = 120 * (atlanLogoImg.height / atlanLogoImg.width);
+                textSize(20);
+                let dataDefenderWidth = textWidth("DATA DEFENDER");
+                let logoW = dataDefenderWidth * 2;
+                let logoH = logoW * (atlanLogoImg.height / atlanLogoImg.width);
                 image(atlanLogoImg, canvasWidth/2 - logoW/2, canvasHeight/2 - 110, logoW, logoH);
             }
             fill(255, 255, 255);
