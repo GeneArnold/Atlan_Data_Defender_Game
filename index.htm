@@ -161,8 +161,8 @@
     <div id="gameContainer"></div>
     <div class="controls">
         <div class="btn" id="leftBtn">LEFT</div>
-        <div class="btn fire" id="fireBtn">FIRE</div>
         <div class="btn" id="rightBtn">RIGHT</div>
+        <div class="btn fire" id="fireBtn">FIRE</div>
     </div>
     <div class="start-btn" id="startBtn">START GAME</div>
     <div class="music-btn" id="musicBtn">MUSIC ON</div>
@@ -223,7 +223,7 @@
             canvas.parent('gameContainer');
             player = {
                 x: canvasWidth / 2,
-                y: canvasHeight * 0.68,
+                y: canvasHeight * 0.78,
                 width: 40,
                 height: 30,
                 speed: 4
@@ -620,7 +620,7 @@
             if (hitTimer <= 0) {
                 gameState = 'playing';
                 player.x = canvasWidth / 2;
-                player.y = canvasHeight * 0.68;
+                player.y = canvasHeight * 0.78;
             }
         }
         
@@ -942,7 +942,7 @@
                     enemies = [];
                     particles = [];
                     player.x = canvasWidth / 2;
-                    player.y = canvasHeight * 0.68;
+                    player.y = canvasHeight * 0.78;
                     invulnerableTimer = 0;
                     gameOverTimer = 0;
                     gameState = 'playing';
@@ -983,7 +983,7 @@
                 enemies = [];
                 particles = [];
                 player.x = canvasWidth / 2;
-                player.y = canvasHeight * 0.68;
+                player.y = canvasHeight * 0.78;
                 invulnerableTimer = 0;
                 gameOverTimer = 0;
                 gameState = 'title';
@@ -996,7 +996,7 @@
             canvasHeight = window.innerHeight;
             resizeCanvas(canvasWidth, canvasHeight);
             player.x = canvasWidth / 2;
-            player.y = canvasHeight * 0.68;
+            player.y = canvasHeight * 0.78;
         }
     </script>
 </body>
