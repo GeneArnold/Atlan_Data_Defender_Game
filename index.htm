@@ -221,15 +221,13 @@
             canvasHeight = window.innerHeight;
             let canvas = createCanvas(canvasWidth, canvasHeight);
             canvas.parent('gameContainer');
-            
             player = {
                 x: canvasWidth / 2,
-                y: canvasHeight - 160,
+                y: canvasHeight - canvasHeight * 0.18,
                 width: 40,
                 height: 30,
                 speed: 4
             };
-            
             setupControls();
         }
         
@@ -622,7 +620,7 @@
             if (hitTimer <= 0) {
                 gameState = 'playing';
                 player.x = canvasWidth / 2;
-                player.y = canvasHeight - 160;
+                player.y = canvasHeight - canvasHeight * 0.18;
             }
         }
         
@@ -785,15 +783,17 @@
         function startBackgroundMusic() {
             if (!musicEnabled) return;
             try {
+                console.log('startBackgroundMusic called');
                 if (!audioContext) {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    console.log('audioContext created in startBackgroundMusic');
                 }
                 backgroundMusic = setInterval(() => {
                     if ((gameState === 'playing' || gameState === 'waveAnnounce') && musicEnabled) {
                         playBackgroundNote();
                     }
                 }, 400);
-            } catch (e) {}
+            } catch (e) { console.log('startBackgroundMusic error:', e); }
         }
         
         function stopBackgroundMusic() {
@@ -807,6 +807,7 @@
             if (!musicEnabled) return;
             try {
                 if (!audioContext) return;
+                console.log('playBackgroundNote called');
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 oscillator.connect(gainNode);
@@ -819,11 +820,12 @@
                 gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.2);
-            } catch (e) {}
+            } catch (e) { console.log('playBackgroundNote error:', e); }
         }
         
         function playHitSound() {
             try {
+                console.log('playHitSound called');
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
@@ -835,11 +837,12 @@
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.1);
-            } catch (e) {}
+            } catch (e) { console.log('playHitSound error:', e); }
         }
         
         function playDeathSound() {
             try {
+                console.log('playDeathSound called');
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
@@ -851,11 +854,12 @@
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.4);
-            } catch (e) {}
+            } catch (e) { console.log('playDeathSound error:', e); }
         }
         
         function playVictorySound() {
             try {
+                console.log('playVictorySound called');
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const notes = [523, 659, 784];
                 notes.forEach((freq, index) => {
@@ -870,7 +874,7 @@
                     oscillator.start(audioContext.currentTime + index * 0.1);
                     oscillator.stop(audioContext.currentTime + index * 0.1 + 0.2);
                 });
-            } catch (e) {}
+            } catch (e) { console.log('playVictorySound error:', e); }
         }
         
         function setupControls() {
@@ -920,9 +924,13 @@
                 e.preventDefault();
                 console.log('START button touchstart');
                 if (typeof audioContext !== 'undefined' && audioContext && audioContext.state === 'suspended') {
+                    console.log('Resuming audioContext...');
                     await audioContext.resume();
+                    console.log('audioContext state after resume:', audioContext.state);
                 } else if (typeof audioContext === 'undefined' || !audioContext) {
+                    console.log('Creating new audioContext...');
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    console.log('audioContext state after creation:', audioContext.state);
                 }
                 if (gameState === 'title' || gameState === 'gameOver') {
                     score = 0;
@@ -934,7 +942,7 @@
                     enemies = [];
                     particles = [];
                     player.x = canvasWidth / 2;
-                    player.y = canvasHeight - 160;
+                    player.y = canvasHeight - canvasHeight * 0.18;
                     invulnerableTimer = 0;
                     gameOverTimer = 0;
                     gameState = 'playing';
@@ -975,7 +983,7 @@
                 enemies = [];
                 particles = [];
                 player.x = canvasWidth / 2;
-                player.y = canvasHeight - 160;
+                player.y = canvasHeight - canvasHeight * 0.18;
                 invulnerableTimer = 0;
                 gameOverTimer = 0;
                 gameState = 'title';
@@ -988,7 +996,7 @@
             canvasHeight = window.innerHeight;
             resizeCanvas(canvasWidth, canvasHeight);
             player.x = canvasWidth / 2;
-            player.y = canvasHeight - 160;
+            player.y = canvasHeight - canvasHeight * 0.18;
         }
     </script>
 </body>
