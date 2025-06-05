@@ -622,7 +622,7 @@
             fill(0, 200, 255);
             textAlign(CENTER);
             textSize(24);
-            text("ATLAN " + GAME_VERSION, canvasWidth/2, canvasHeight/2 - 60);
+            text("ATLAN ", canvasWidth/2, canvasHeight/2 - 60);
             
             fill(255, 255, 255);
             textSize(20);
@@ -631,6 +631,10 @@
             fill(255, 255, 0);
             textSize(14);
             text("Protect Your Data!", canvasWidth/2, canvasHeight/2 - 10);
+
+            fill(255, 255, 0);
+            textSize(14);
+            text("version " + GAME_VERSION, canvasWidth/2, canvasHeight/2 - 10);
         }
         
         function drawPlayerHit() {
