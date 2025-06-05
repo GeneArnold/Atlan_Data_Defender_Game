@@ -875,39 +875,52 @@
         
         function setupControls() {
             // Touch controls
-            document.getElementById('leftBtn').addEventListener('touchstart', (e) => {
+            const leftBtn = document.getElementById('leftBtn');
+            const rightBtn = document.getElementById('rightBtn');
+            const fireBtn = document.getElementById('fireBtn');
+
+            // LEFT
+            leftBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 leftPressed = true;
-            });
-            document.getElementById('leftBtn').addEventListener('touchend', (e) => {
+            }, { passive: false });
+            leftBtn.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 leftPressed = false;
-            });
-            document.getElementById('rightBtn').addEventListener('touchstart', (e) => {
+            }, { passive: false });
+            leftBtn.addEventListener('mousedown', () => leftPressed = true);
+            leftBtn.addEventListener('mouseup', () => leftPressed = false);
+            leftBtn.addEventListener('mouseleave', () => leftPressed = false);
+            leftBtn.addEventListener('click', (e) => { e.preventDefault(); });
+
+            // RIGHT
+            rightBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 rightPressed = true;
-            });
-            document.getElementById('rightBtn').addEventListener('touchend', (e) => {
+            }, { passive: false });
+            rightBtn.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 rightPressed = false;
-            });
-            document.getElementById('fireBtn').addEventListener('touchstart', (e) => {
+            }, { passive: false });
+            rightBtn.addEventListener('mousedown', () => rightPressed = true);
+            rightBtn.addEventListener('mouseup', () => rightPressed = false);
+            rightBtn.addEventListener('mouseleave', () => rightPressed = false);
+            rightBtn.addEventListener('click', (e) => { e.preventDefault(); });
+
+            // FIRE
+            fireBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 firePressed = true;
-            });
-            document.getElementById('fireBtn').addEventListener('touchend', (e) => {
+            }, { passive: false });
+            fireBtn.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 firePressed = false;
-            });
-            
-            // Mouse controls
-            document.getElementById('leftBtn').addEventListener('mousedown', () => leftPressed = true);
-            document.getElementById('leftBtn').addEventListener('mouseup', () => leftPressed = false);
-            document.getElementById('rightBtn').addEventListener('mousedown', () => rightPressed = true);
-            document.getElementById('rightBtn').addEventListener('mouseup', () => rightPressed = false);
-            document.getElementById('fireBtn').addEventListener('mousedown', () => firePressed = true);
-            document.getElementById('fireBtn').addEventListener('mouseup', () => firePressed = false);
-            
+            }, { passive: false });
+            fireBtn.addEventListener('mousedown', () => firePressed = true);
+            fireBtn.addEventListener('mouseup', () => firePressed = false);
+            fireBtn.addEventListener('mouseleave', () => firePressed = false);
+            fireBtn.addEventListener('click', (e) => { e.preventDefault(); });
+
             // Start button
             document.getElementById('startBtn').addEventListener('click', () => {
                 if (gameState === 'title' || gameState === 'gameOver') {
