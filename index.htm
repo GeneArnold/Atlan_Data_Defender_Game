@@ -883,35 +883,42 @@
             leftBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 leftPressed = true;
+                console.log('LEFT button touchstart');
             }, { passive: false });
             leftBtn.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 leftPressed = false;
+                console.log('LEFT button touchend');
             }, { passive: false });
 
             // RIGHT
             rightBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 rightPressed = true;
+                console.log('RIGHT button touchstart');
             }, { passive: false });
             rightBtn.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 rightPressed = false;
+                console.log('RIGHT button touchend');
             }, { passive: false });
 
             // FIRE
             fireBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 firePressed = true;
+                console.log('FIRE button touchstart');
             }, { passive: false });
             fireBtn.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 firePressed = false;
+                console.log('FIRE button touchend');
             }, { passive: false });
 
             // Start button
             document.getElementById('startBtn').addEventListener('touchstart', async (e) => {
                 e.preventDefault();
+                console.log('START button touchstart');
                 if (typeof audioContext !== 'undefined' && audioContext && audioContext.state === 'suspended') {
                     await audioContext.resume();
                 } else if (typeof audioContext === 'undefined' || !audioContext) {
@@ -941,6 +948,7 @@
                 e.preventDefault();
                 musicEnabled = !musicEnabled;
                 const musicBtn = document.getElementById('musicBtn');
+                console.log('MUSIC button touchstart, musicEnabled:', musicEnabled);
                 if (musicEnabled) {
                     musicBtn.textContent = 'MUSIC ON';
                     musicBtn.classList.remove('off');
@@ -957,6 +965,7 @@
             // Quit button
             document.getElementById('quitBtn').addEventListener('touchstart', (e) => {
                 e.preventDefault();
+                console.log('QUIT button touchstart');
                 score = 0;
                 wave = 1;
                 lives = 3;
