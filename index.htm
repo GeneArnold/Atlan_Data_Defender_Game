@@ -265,13 +265,13 @@
         
         function updateGame() {
             // Controls
-            if ((leftPressed || keyIsDown(65) || keyIsDown(LEFT_ARROW)) && player.x > player.width/2) {
+            if (leftPressed && player.x > player.width/2) {
                 player.x -= player.speed;
             }
-            if ((rightPressed || keyIsDown(68) || keyIsDown(RIGHT_ARROW)) && player.x < canvasWidth - player.width/2) {
+            if (rightPressed && player.x < canvasWidth - player.width/2) {
                 player.x += player.speed;
             }
-            if ((firePressed || keyIsDown(87) || keyIsDown(UP_ARROW) || keyIsDown(32)) && bullets.length === 0) {
+            if (firePressed && bullets.length === 0) {
                 bullets.push({
                     x: player.x,
                     y: player.y - 10,
@@ -575,7 +575,7 @@
             fill(0, 200, 255);
             textAlign(CENTER);
             textSize(24);
-            text("ATLAN Game", canvasWidth/2, canvasHeight/2 - 60);
+            text("ATLAN", canvasWidth/2, canvasHeight/2 - 60);
             
             fill(255, 255, 255);
             textSize(20);
@@ -874,7 +874,7 @@
         }
         
         function setupControls() {
-            // Touch controls
+            // Touch controls only
             const leftBtn = document.getElementById('leftBtn');
             const rightBtn = document.getElementById('rightBtn');
             const fireBtn = document.getElementById('fireBtn');
@@ -888,10 +888,6 @@
                 e.preventDefault();
                 leftPressed = false;
             }, { passive: false });
-            leftBtn.addEventListener('mousedown', () => leftPressed = true);
-            leftBtn.addEventListener('mouseup', () => leftPressed = false);
-            leftBtn.addEventListener('mouseleave', () => leftPressed = false);
-            leftBtn.addEventListener('click', (e) => { e.preventDefault(); });
 
             // RIGHT
             rightBtn.addEventListener('touchstart', (e) => {
@@ -902,10 +898,6 @@
                 e.preventDefault();
                 rightPressed = false;
             }, { passive: false });
-            rightBtn.addEventListener('mousedown', () => rightPressed = true);
-            rightBtn.addEventListener('mouseup', () => rightPressed = false);
-            rightBtn.addEventListener('mouseleave', () => rightPressed = false);
-            rightBtn.addEventListener('click', (e) => { e.preventDefault(); });
 
             // FIRE
             fireBtn.addEventListener('touchstart', (e) => {
@@ -916,13 +908,15 @@
                 e.preventDefault();
                 firePressed = false;
             }, { passive: false });
-            fireBtn.addEventListener('mousedown', () => firePressed = true);
-            fireBtn.addEventListener('mouseup', () => firePressed = false);
-            fireBtn.addEventListener('mouseleave', () => firePressed = false);
-            fireBtn.addEventListener('click', (e) => { e.preventDefault(); });
 
             // Start button
-            document.getElementById('startBtn').addEventListener('click', () => {
+            document.getElementById('startBtn').addEventListener('touchstart', async (e) => {
+                e.preventDefault();
+                if (typeof audioContext !== 'undefined' && audioContext && audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                } else if (typeof audioContext === 'undefined' || !audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
                 if (gameState === 'title' || gameState === 'gameOver') {
                     score = 0;
                     wave = 1;
@@ -940,10 +934,11 @@
                     startBackgroundMusic();
                     startWave();
                 }
-            });
+            }, { passive: false });
             
             // Music toggle
-            document.getElementById('musicBtn').addEventListener('click', () => {
+            document.getElementById('musicBtn').addEventListener('touchstart', (e) => {
+                e.preventDefault();
                 musicEnabled = !musicEnabled;
                 const musicBtn = document.getElementById('musicBtn');
                 if (musicEnabled) {
@@ -957,10 +952,11 @@
                     musicBtn.classList.add('off');
                     stopBackgroundMusic();
                 }
-            });
+            }, { passive: false });
             
             // Quit button
-            document.getElementById('quitBtn').addEventListener('click', () => {
+            document.getElementById('quitBtn').addEventListener('touchstart', (e) => {
+                e.preventDefault();
                 score = 0;
                 wave = 1;
                 lives = 3;
@@ -975,38 +971,9 @@
                 gameOverTimer = 0;
                 gameState = 'title';
                 stopBackgroundMusic();
-            });
+            }, { passive: false });
         }
         
-        function mousePressed() {
-            return false;
-        }
-        
-        function touchStarted() {
-            return false;
-        }
-        
-        function keyPressed() {
-            if (gameState === 'title' && (key === ' ' || keyCode === 13)) {
-                score = 0;
-                wave = 1;
-                lives = 3;
-                enemiesKilled = 0;
-                enemiesNeededForWave = 25;
-                bullets = [];
-                enemies = [];
-                particles = [];
-                player.x = canvasWidth / 2;
-                player.y = canvasHeight - 160;
-                invulnerableTimer = 0;
-                gameOverTimer = 0;
-                gameState = 'playing';
-                startBackgroundMusic();
-                startWave();
-            }
-            return false;
-        }
-
         function windowResized() {
             canvasWidth = window.innerWidth;
             canvasHeight = window.innerHeight;
