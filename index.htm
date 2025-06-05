@@ -172,7 +172,7 @@
     <script>
         // === GLOBAL LAYOUT CONSTANTS ===
         // Adjust these to tune layout easily
-        const GAME_VERSION = '1.1.0'; // Game version number (major: alien/evil enemy redesign)
+        const GAME_VERSION = '1.1.1'; // Game version number (Atlan SVG logo on title screen)
         const PLAYER_Y_RATIO = 0.75; // 0.90 = near bottom, 0.5 = middle, 0.1 = near top
         // === ENEMY/WAVE CONFIGURATION ===
         // Set the number of bad guys needed to complete each wave here:
@@ -263,6 +263,13 @@
         let melodyTempo = 400; // ms per note
         const MIN_TEMPO = 120; // Fastest allowed (ms per note)
         let playingVictory = false;
+        
+        // Atlan logo SVG
+        let atlanLogoImg;
+        
+        function preload() {
+            atlanLogoImg = loadImage('https://upload.wikimedia.org/wikipedia/commons/1/1e/Atlan-logo-full.svg');
+        }
         
         function setup() {
             canvasWidth = window.innerWidth;
@@ -688,29 +695,26 @@
                     points: typeObj.points
                 });
             }
-            
             for (let i = enemies.length - 1; i >= 0; i--) {
                 enemies[i].y += enemies[i].speed;
                 drawEnemy(enemies[i]);
-                
                 if (enemies[i].y > canvasHeight + 50) {
                     enemies.splice(i, 1);
                 }
             }
-            
-            fill(0, 200, 255);
-            textAlign(CENTER);
-            textSize(24);
-            text("ATLAN ", canvasWidth/2, canvasHeight/2 - 60);
-            
+            // Draw Atlan SVG logo centered above DATA DEFENDER
+            if (atlanLogoImg) {
+                let logoW = 120;
+                let logoH = 120 * (atlanLogoImg.height / atlanLogoImg.width);
+                image(atlanLogoImg, canvasWidth/2 - logoW/2, canvasHeight/2 - 110, logoW, logoH);
+            }
             fill(255, 255, 255);
+            textAlign(CENTER);
             textSize(20);
             text("DATA DEFENDER", canvasWidth/2, canvasHeight/2 - 35);
-            
             fill(255, 255, 0);
             textSize(14);
             text("Protect Your Data!", canvasWidth/2, canvasHeight/2 - 10);
-
             fill(255, 255, 0);
             textSize(14);
             text("version " + GAME_VERSION, canvasWidth/2, canvasHeight/2 + 10);
