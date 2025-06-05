@@ -172,7 +172,7 @@
     <script>
         // === GLOBAL LAYOUT CONSTANTS ===
         // Adjust these to tune layout easily
-        const GAME_VERSION = '1.0.7'; // Game version number
+        const GAME_VERSION = '1.0.9'; // Game version number (darker enemies + darker music + persistent AudioContext)
         const PLAYER_Y_RATIO = 0.75; // 0.90 = near bottom, 0.5 = middle, 0.1 = near top
         // === ENEMY/WAVE CONFIGURATION ===
         // Set the number of bad guys needed to complete each wave here:
@@ -227,36 +227,36 @@
         
         // Data catalog-themed enemy definitions
         const ENEMY_TYPES = [
-            { type: 'pii', label: 'PII Breach', color: [255, 50, 50], points: 30 },
-            { type: 'quality', label: 'Bad Quality', color: [150, 150, 150], points: 20 },
-            { type: 'lost', label: 'Lost Data', color: [139, 69, 19], points: 10 },
-            { type: 'orphan', label: 'Orphaned Table', color: [0, 200, 255], points: 25 },
-            { type: 'unclassified', label: 'Unclassified File', color: [255, 200, 0], points: 18 },
-            { type: 'stale', label: 'Stale Report', color: [180, 180, 255], points: 15 },
-            { type: 'lineage', label: 'Broken Lineage', color: [255, 0, 200], points: 22 },
-            { type: 'duplicate', label: 'Duplicate Asset', color: [0, 255, 100], points: 16 },
-            { type: 'unapproved', label: 'Unapproved Query', color: [255, 100, 0], points: 20 },
-            { type: 'policy', label: 'Policy Violation', color: [255, 0, 0], points: 28 },
-            { type: 'uncertified', label: 'Uncertified Data', color: [100, 100, 255], points: 19 },
-            { type: 'unknown', label: 'Unknown Owner', color: [100, 255, 255], points: 17 }
+            { type: 'pii', label: 'PII Breach', color: [120, 0, 0], points: 30 }, // deep red
+            { type: 'quality', label: 'Bad Quality', color: [60, 60, 60], points: 20 }, // dark gray
+            { type: 'lost', label: 'Lost Data', color: [70, 35, 10], points: 10 }, // dark brown
+            { type: 'orphan', label: 'Orphaned Table', color: [0, 80, 120], points: 25 }, // dark cyan
+            { type: 'unclassified', label: 'Unclassified File', color: [120, 90, 0], points: 18 }, // dark gold
+            { type: 'stale', label: 'Stale Report', color: [60, 60, 100], points: 15 }, // dark blue-gray
+            { type: 'lineage', label: 'Broken Lineage', color: [90, 0, 80], points: 22 }, // dark magenta
+            { type: 'duplicate', label: 'Duplicate Asset', color: [0, 80, 30], points: 16 }, // dark green
+            { type: 'unapproved', label: 'Unapproved Query', color: [120, 40, 0], points: 20 }, // dark orange
+            { type: 'policy', label: 'Policy Violation', color: [120, 0, 0], points: 28 }, // deep red
+            { type: 'uncertified', label: 'Uncertified Data', color: [30, 30, 80], points: 19 }, // dark blue
+            { type: 'unknown', label: 'Unknown Owner', color: [30, 80, 80], points: 17 } // dark teal
         ];
         
         // === MUSIC CONFIGURATION ===
-        // Classic arcade-style main melody (C E G A G E)
+        // Darker, minor-key arcade melody (A C E F E C)
         const MAIN_MELODY = [
-            262, // C4
-            330, // E4
-            392, // G4
-            440, // A4
-            392, // G4
-            330  // E4
+            220, // A3
+            261.63, // C4
+            329.63, // E4
+            349.23, // F4
+            329.63, // E4
+            261.63  // C4
         ];
-        // Victory melody (C E G C5)
+        // Darker victory melody (A C F A4)
         const VICTORY_MELODY = [
-            262, // C4
-            330, // E4
-            392, // G4
-            523  // C5
+            220, // A3
+            261.63, // C4
+            349.23, // F4
+            440    // A4
         ];
         let melodyIndex = 0;
         let melodyInterval = null;
@@ -516,7 +516,7 @@
             translate(enemy.x, enemy.y);
             noStroke();
             // Use color from enemy definition
-            fill(enemy.color[0], enemy.color[1], enemy.color[2]);
+            fill(enemy.color[0], enemy.color[1], enemy.color[2], 200); // darker, less alpha
             if (enemy.type === 'pii') {
                 beginShape();
                 vertex(-12, -12);
@@ -894,8 +894,8 @@
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-                oscillator.type = 'square';
-                gainNode.gain.setValueAtTime(0.04, audioContext.currentTime);
+                oscillator.type = 'sawtooth'; // darker, more ominous
+                gainNode.gain.setValueAtTime(0.025, audioContext.currentTime); // slightly lower volume
                 gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.18);
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.18);
@@ -905,16 +905,18 @@
         
         function playHitSound() {
             try {
-                console.log('playHitSound called');
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
                 oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
-                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.07, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                oscillator.type = 'triangle';
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.1);
             } catch (e) { console.log('playHitSound error:', e); }
@@ -922,16 +924,18 @@
         
         function playDeathSound() {
             try {
-                console.log('playDeathSound called');
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
                 oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
                 oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.4);
-                gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.09, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                oscillator.type = 'triangle';
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.4);
             } catch (e) { console.log('playDeathSound error:', e); }
@@ -956,8 +960,8 @@
                     oscillator.connect(gainNode);
                     gainNode.connect(audioContext.destination);
                     oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-                    oscillator.type = 'triangle';
-                    gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+                    oscillator.type = 'triangle'; // still a bit dark
+                    gainNode.gain.setValueAtTime(0.045, audioContext.currentTime);
                     gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.22);
                     oscillator.start(audioContext.currentTime);
                     oscillator.stop(audioContext.currentTime + 0.22);
