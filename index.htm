@@ -169,6 +169,11 @@
     <div class="quit-btn" id="quitBtn">QUIT</div>
 
     <script>
+        // === GLOBAL LAYOUT CONSTANTS ===
+        // Adjust these to tune layout easily
+        const PLAYER_Y_RATIO = 0.68; // 0.90 = near bottom, 0.5 = middle, 0.1 = near top
+        // (You could add BUTTON_SIZE, MARGIN, etc. here for further tuning)
+        
         // Game state
         let gameState = 'title';
         let player;
@@ -223,7 +228,7 @@
             canvas.parent('gameContainer');
             player = {
                 x: canvasWidth / 2,
-                y: canvasHeight * 0.90, // Set virtical placement of player
+                y: canvasHeight * PLAYER_Y_RATIO, // Use global var for vertical placement
                 width: 40,
                 height: 30,
                 speed: 4
@@ -620,7 +625,7 @@
             if (hitTimer <= 0) {
                 gameState = 'playing';
                 player.x = canvasWidth / 2;
-                player.y = canvasHeight * 0.78;
+                player.y = canvasHeight * PLAYER_Y_RATIO;
             }
         }
         
@@ -942,7 +947,7 @@
                     enemies = [];
                     particles = [];
                     player.x = canvasWidth / 2;
-                    player.y = canvasHeight * 0.78;
+                    player.y = canvasHeight * PLAYER_Y_RATIO;
                     invulnerableTimer = 0;
                     gameOverTimer = 0;
                     gameState = 'playing';
@@ -983,7 +988,7 @@
                 enemies = [];
                 particles = [];
                 player.x = canvasWidth / 2;
-                player.y = canvasHeight * 0.78;
+                player.y = canvasHeight * PLAYER_Y_RATIO;
                 invulnerableTimer = 0;
                 gameOverTimer = 0;
                 gameState = 'title';
@@ -996,7 +1001,7 @@
             canvasHeight = window.innerHeight;
             resizeCanvas(canvasWidth, canvasHeight);
             player.x = canvasWidth / 2;
-            player.y = canvasHeight * 0.78;
+            player.y = canvasHeight * PLAYER_Y_RATIO;
         }
     </script>
 </body>
