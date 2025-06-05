@@ -172,7 +172,7 @@
     <script>
         // === GLOBAL LAYOUT CONSTANTS ===
         // Adjust these to tune layout easily
-        const GAME_VERSION = '1.0.6'; // Game version number
+        const GAME_VERSION = '1.0.7'; // Game version number
         const PLAYER_Y_RATIO = 0.75; // 0.90 = near bottom, 0.5 = middle, 0.1 = near top
         // === ENEMY/WAVE CONFIGURATION ===
         // Set the number of bad guys needed to complete each wave here:
@@ -240,6 +240,29 @@
             { type: 'uncertified', label: 'Uncertified Data', color: [100, 100, 255], points: 19 },
             { type: 'unknown', label: 'Unknown Owner', color: [100, 255, 255], points: 17 }
         ];
+        
+        // === MUSIC CONFIGURATION ===
+        // Classic arcade-style main melody (C E G A G E)
+        const MAIN_MELODY = [
+            262, // C4
+            330, // E4
+            392, // G4
+            440, // A4
+            392, // G4
+            330  // E4
+        ];
+        // Victory melody (C E G C5)
+        const VICTORY_MELODY = [
+            262, // C4
+            330, // E4
+            392, // G4
+            523  // C5
+        ];
+        let melodyIndex = 0;
+        let melodyInterval = null;
+        let melodyTempo = 400; // ms per note
+        const MIN_TEMPO = 120; // Fastest allowed (ms per note)
+        let playingVictory = false;
         
         function setup() {
             canvasWidth = window.innerWidth;
@@ -373,7 +396,7 @@
                         enemiesKilled++;
                         
                         if (enemiesKilled >= enemiesNeededForWave) {
-                            playVictorySound();
+                            playVictoryMelody();
                             nextWave();
                         }
                         
@@ -839,44 +862,45 @@
         function startBackgroundMusic() {
             if (!musicEnabled) return;
             try {
-                console.log('startBackgroundMusic called');
                 if (!audioContext) {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    console.log('audioContext created in startBackgroundMusic');
                 }
-                backgroundMusic = setInterval(() => {
-                    if ((gameState === 'playing' || gameState === 'waveAnnounce') && musicEnabled) {
-                        playBackgroundNote();
+                stopBackgroundMusic(); // Stop any previous melody
+                melodyIndex = 0;
+                melodyTempo = Math.max(400 - (wave - 1) * 30, MIN_TEMPO); // Increase tempo with wave
+                playingVictory = false;
+                melodyInterval = setInterval(() => {
+                    if ((gameState === 'playing' || gameState === 'waveAnnounce') && musicEnabled && !playingVictory) {
+                        playMelodyNote();
                     }
-                }, 400);
+                }, melodyTempo);
             } catch (e) { console.log('startBackgroundMusic error:', e); }
         }
         
         function stopBackgroundMusic() {
-            if (backgroundMusic) {
-                clearInterval(backgroundMusic);
-                backgroundMusic = null;
+            if (melodyInterval) {
+                clearInterval(melodyInterval);
+                melodyInterval = null;
             }
         }
         
-        function playBackgroundNote() {
+        function playMelodyNote() {
             if (!musicEnabled) return;
             try {
                 if (!audioContext) return;
-                console.log('playBackgroundNote called');
+                const freq = MAIN_MELODY[melodyIndex % MAIN_MELODY.length];
                 const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
                 oscillator.connect(gainNode);
                 gainNode.connect(audioContext.destination);
-                const notes = [330, 370, 392, 440];
-                const randomNote = notes[Math.floor(Math.random() * notes.length)];
-                oscillator.frequency.setValueAtTime(randomNote, audioContext.currentTime);
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
                 oscillator.type = 'square';
-                gainNode.gain.setValueAtTime(0.02, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.04, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.18);
                 oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.2);
-            } catch (e) { console.log('playBackgroundNote error:', e); }
+                oscillator.stop(audioContext.currentTime + 0.18);
+                melodyIndex++;
+            } catch (e) { console.log('playMelodyNote error:', e); }
         }
         
         function playHitSound() {
@@ -913,24 +937,35 @@
             } catch (e) { console.log('playDeathSound error:', e); }
         }
         
-        function playVictorySound() {
+        function playVictoryMelody() {
+            if (!musicEnabled) return;
             try {
-                console.log('playVictorySound called');
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const notes = [523, 659, 784];
-                notes.forEach((freq, index) => {
+                playingVictory = true;
+                stopBackgroundMusic();
+                let idx = 0;
+                function playNextVictoryNote() {
+                    if (!musicEnabled) return;
+                    if (idx >= VICTORY_MELODY.length) {
+                        playingVictory = false;
+                        startBackgroundMusic();
+                        return;
+                    }
+                    const freq = VICTORY_MELODY[idx];
                     const oscillator = audioContext.createOscillator();
                     const gainNode = audioContext.createGain();
                     oscillator.connect(gainNode);
                     gainNode.connect(audioContext.destination);
-                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime + index * 0.1);
-                    oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime + index * 0.1);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + index * 0.1 + 0.2);
-                    oscillator.start(audioContext.currentTime + index * 0.1);
-                    oscillator.stop(audioContext.currentTime + index * 0.1 + 0.2);
-                });
-            } catch (e) { console.log('playVictorySound error:', e); }
+                    oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                    oscillator.type = 'triangle';
+                    gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.22);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.22);
+                    idx++;
+                    setTimeout(playNextVictoryNote, 220);
+                }
+                playNextVictoryNote();
+            } catch (e) { console.log('playVictoryMelody error:', e); }
         }
         
         function setupControls() {
