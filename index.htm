@@ -172,7 +172,7 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.2.0'; // Major refactor: tunable constants, comments, cleanup
+        const GAME_VERSION = '1.2.1'; // Music fix: use new tempo constants
 
         // --- Player Settings ---
         const PLAYER_START_LIVES = 3; // Number of lives per game
@@ -936,7 +936,7 @@
                 }
                 stopBackgroundMusic(); // Stop any previous melody
                 melodyIndex = 0;
-                melodyTempo = Math.max(400 - (wave - 1) * 30, MIN_TEMPO); // Increase tempo with wave
+                melodyTempo = Math.max(MUSIC_TEMPO_BASE - (wave - 1) * MUSIC_TEMPO_DECREASE, MUSIC_TEMPO_MIN); // Increase tempo with wave
                 playingVictory = false;
                 melodyInterval = setInterval(() => {
                     if ((gameState === 'playing' || gameState === 'waveAnnounce') && musicEnabled && !playingVictory) {
