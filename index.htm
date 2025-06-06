@@ -170,28 +170,58 @@
     <div id="version" style="position:fixed;bottom:5px;right:10px;font-size:12px;color:#aaa;z-index:200;pointer-events:none;">v<span id="versionNum"></span></div>
 
     <script>
-        // === GLOBAL LAYOUT CONSTANTS ===
-        // Adjust these to tune layout easily
-        const GAME_VERSION = '1.1.4'; // Game version number (logo raised above DATA DEFENDER, filename atlan_logo.svg)
-        const PLAYER_Y_RATIO = 0.75; // 0.90 = near bottom, 0.5 = middle, 0.1 = near top
-        // === ENEMY/WAVE CONFIGURATION ===
-        // Set the number of bad guys needed to complete each wave here:
-        const BAD_GUYS_PER_WAVE = [
-            25, // Wave 1
-            30, // Wave 2
-            35, // Wave 3
-            40, // Wave 4
-            45, // Wave 5
-            50, // Wave 6
-            55, // Wave 7
-            60, // Wave 8
-            65, // Wave 9
-            70, // Wave 10
-            75, // Wave 11
-            80, // Wave 12
-            85  // Wave 13+
+        // === GLOBAL GAME CONSTANTS ===
+        // Versioning
+        const GAME_VERSION = '1.2.0'; // Major refactor: tunable constants, comments, cleanup
+
+        // --- Player Settings ---
+        const PLAYER_START_LIVES = 3; // Number of lives per game
+        const PLAYER_SPEED = 4;       // Horizontal speed of player ship
+        const PLAYER_WIDTH = 40;      // Width of player ship
+        const PLAYER_HEIGHT = 30;     // Height of player ship
+        const PLAYER_Y_RATIO = 0.75;  // Vertical position ratio (0.9 = near bottom, 0.5 = middle)
+        const PLAYER_INVULNERABLE_FRAMES = 180; // Frames of invulnerability after hit
+
+        // --- Bullet Settings ---
+        const BULLET_SPEED = 8;       // Speed of player bullets
+        const BULLET_WIDTH = 4;       // Width of bullet
+        const BULLET_HEIGHT = 12;     // Height of bullet
+        const MAX_BULLETS = 1;        // Max bullets on screen at once
+
+        // --- Enemy & Wave Settings ---
+        const BAD_GUYS_PER_WAVE = [   // Number of enemies to defeat per wave
+            25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85
         ];
-        // (You could add BUTTON_SIZE, MARGIN, etc. here for further tuning)
+        const ENEMY_SPAWN_BASE = 30;  // Base spawn interval (frames)
+        const ENEMY_SPAWN_DECREASE = 3; // Spawn interval decrease per wave
+        const ENEMY_SPAWN_MIN = 10;   // Minimum spawn interval (frames)
+        const ENEMY_SPEED_SCALE = 0.3; // Additional speed per wave
+        const ENEMY_START_Y = -30;    // Y position where enemies spawn
+        const ENEMY_MIN_X = 30;       // Min X for enemy spawn
+        const ENEMY_MAX_X_OFFSET = 30;// Max X offset for enemy spawn
+
+        // --- Wave Announcement & Game Over ---
+        const WAVE_ANNOUNCE_FRAMES = 180; // Frames to show wave announcement
+        const PLAYER_HIT_FRAMES = 120;    // Frames to show player hit screen
+        const GAME_OVER_FRAMES = 300;     // Frames to show game over screen
+
+        // --- Explosion/Particle Settings ---
+        const EXPLOSION_PARTICLES = 8;    // Number of particles per explosion
+        const PARTICLE_LIFE = 20;         // Frames each particle lasts
+        const EXPLOSION_FRAMES = 30;      // Frames explosion animation lasts
+
+        // --- Music Settings ---
+        const MAIN_MELODY = [220, 261.63, 329.63, 349.23, 329.63, 261.63]; // Minor key
+        const VICTORY_MELODY = [220, 261.63, 349.23, 440];
+        const MUSIC_TEMPO_BASE = 400;     // ms per note at wave 1
+        const MUSIC_TEMPO_DECREASE = 30;  // ms decrease per wave
+        const MUSIC_TEMPO_MIN = 120;      // Fastest allowed (ms per note)
+
+        // --- Canvas/Display Settings ---
+        const STAR_COUNT = 30;            // Number of background stars
+        const STAR_X_STEP = 37;           // Star X spacing
+        const STAR_Y_STEP = 23;           // Star Y spacing
+        const STAR_SCROLL_SPEED = 0.3;    // Star vertical scroll speed
         
         // Game state
         let gameState = 'title';
@@ -240,29 +270,6 @@
             { type: 'uncertified', label: 'Uncertified Data', color: [30, 30, 80], points: 19 }, // dark blue
             { type: 'unknown', label: 'Unknown Owner', color: [30, 80, 80], points: 17 } // dark teal
         ];
-        
-        // === MUSIC CONFIGURATION ===
-        // Darker, minor-key arcade melody (A C E F E C)
-        const MAIN_MELODY = [
-            220, // A3
-            261.63, // C4
-            329.63, // E4
-            349.23, // F4
-            329.63, // E4
-            261.63  // C4
-        ];
-        // Darker victory melody (A C F A4)
-        const VICTORY_MELODY = [
-            220, // A3
-            261.63, // C4
-            349.23, // F4
-            440    // A4
-        ];
-        let melodyIndex = 0;
-        let melodyInterval = null;
-        let melodyTempo = 400; // ms per note
-        const MIN_TEMPO = 120; // Fastest allowed (ms per note)
-        let playingVictory = false;
         
         // Atlan logo SVG
         let atlanLogoImg;
