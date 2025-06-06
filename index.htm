@@ -172,7 +172,7 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.2.1'; // Music fix: use new tempo constants
+        const GAME_VERSION = '1.2.2'; // Music fix: restore missing melody globals
 
         // --- Player Settings ---
         const PLAYER_START_LIVES = 3; // Number of lives per game
@@ -223,7 +223,7 @@
         const STAR_Y_STEP = 23;           // Star Y spacing
         const STAR_SCROLL_SPEED = 0.3;    // Star vertical scroll speed
         
-        // Game state
+        // Game state and music variables
         let gameState = 'title';
         let player;
         let bullets = [];
@@ -240,6 +240,11 @@
         let enemiesNeededForWave = 25;
         let hitTimer = 0;
         let explosions = [];
+        // --- Music globals ---
+        let melodyIndex = 0;
+        let melodyTempo = MUSIC_TEMPO_BASE;
+        let melodyInterval = null;
+        let playingVictory = false;
         
         // Controls
         let leftPressed = false;
