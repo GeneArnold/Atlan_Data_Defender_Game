@@ -207,6 +207,7 @@
         const ENEMY_START_Y = -30;    // Y position where enemies spawn
         const ENEMY_MIN_X = 30;       // Min X for enemy spawn
         const ENEMY_MAX_X_OFFSET = 30;// Max X offset for enemy spawn
+        const BONUS_LIFE_CHANCE = 0.05; // 5% chance for bonus life enemy to spawn
 
         // --- Wave Announcement & Game Over ---
         const WAVE_ANNOUNCE_FRAMES = 180; // Frames to show wave announcement
@@ -281,7 +282,8 @@
             { type: 'unapproved', label: 'Unapproved Query', color: [120, 40, 0], points: 20 }, // dark orange
             { type: 'policy', label: 'Policy Violation', color: [120, 0, 0], points: 28 }, // deep red
             { type: 'uncertified', label: 'Uncertified Data', color: [30, 30, 80], points: 19 }, // dark blue
-            { type: 'unknown', label: 'Unknown Owner', color: [30, 80, 80], points: 17 } // dark teal
+            { type: 'unknown', label: 'Unknown Owner', color: [30, 80, 80], points: 17 }, // dark teal
+            { type: 'bonus', label: 'BONUS LIFE!', color: [255, 215, 0], points: 50, isBonus: true } // gold
         ];
         
         // Atlan logo SVG
@@ -415,10 +417,30 @@
                         explosions.push({
                             x: enemies[j].x,
                             y: enemies[j].y,
-                            timer: 30, // 0.5 sec at 60fps
+                            timer: 30,
                             frame: 0
                         });
-                        playHitSound();
+                        
+                        if (enemies[j].isBonus) {
+                            playBonusLifeSound();
+                            lives = min(lives + 1, 5); // Cap at 5 lives
+                            // Create special bonus explosion
+                            for (let k = 0; k < 20; k++) {
+                                particles.push({
+                                    x: enemies[j].x,
+                                    y: enemies[j].y,
+                                    vx: random(-4, 4),
+                                    vy: random(-4, 4),
+                                    r: 255,
+                                    g: 215,
+                                    b: 0,
+                                    life: 30
+                                });
+                            }
+                        } else {
+                            playHitSound();
+                        }
+                        
                         score += enemies[j].points;
                         enemiesKilled++;
                         
@@ -542,154 +564,174 @@
             push();
             translate(enemy.x, enemy.y);
             noStroke();
-            // ALIEN/EVIL ENEMY REDESIGNS
-            if (enemy.type === 'pii') {
-                // Red demon head with horns and glowing yellow eyes
-                fill(220, 0, 0);
-                ellipse(0, 0, 28, 28);
-                fill(255, 255, 0);
-                ellipse(-7, -4, 6, 8); // left eye
-                ellipse(7, -4, 6, 8); // right eye
-                fill(120, 0, 0);
-                arc(0, 8, 16, 10, 0, PI, CHORD); // mouth
-                fill(255, 255, 255);
-                triangle(-10, -14, -4, -18, -2, -8); // left horn
-                triangle(10, -14, 4, -18, 2, -8); // right horn
-            } else if (enemy.type === 'quality') {
-                // Gray cyclops blob with a big green eye and fangs
-                fill(80, 80, 80);
-                ellipse(0, 0, 30, 24);
-                fill(0, 255, 0);
-                ellipse(0, -2, 10, 10); // big eye
-                fill(0);
-                ellipse(0, -2, 4, 4); // pupil
-                fill(255);
-                triangle(-4, 8, -2, 12, 0, 8); // left fang
-                triangle(4, 8, 2, 12, 0, 8); // right fang
-            } else if (enemy.type === 'lost') {
-                // Brown spiky virus with glowing orange core
-                fill(120, 60, 20);
-                ellipse(0, 0, 24, 24);
-                for (let a = 0; a < TWO_PI; a += PI/4) {
-                    let x1 = cos(a) * 12, y1 = sin(a) * 12;
-                    let x2 = cos(a) * 18, y2 = sin(a) * 18;
-                    stroke(120, 60, 20);
-                    strokeWeight(3);
-                    line(x1, y1, x2, y2);
-                }
-                noStroke();
-                fill(255, 140, 0, 180);
+            
+            if (enemy.isBonus) {
+                // Draw bonus life enemy (golden shield with pulsing effect)
+                let pulse = sin(frameCount * 0.1) * 0.2 + 0.8; // Pulsing effect
+                fill(255, 215, 0, 200 * pulse); // Gold color with pulse
+                ellipse(0, 0, 30, 30);
+                fill(255, 255, 255, 200 * pulse);
+                ellipse(0, 0, 20, 20);
+                fill(255, 215, 0, 200 * pulse);
                 ellipse(0, 0, 10, 10);
-            } else if (enemy.type === 'orphan') {
-                // Blue floating jellyfish with tentacles and glowing eyes
-                fill(0, 180, 255);
-                ellipse(0, 0, 26, 18);
-                fill(255, 255, 255, 200);
-                ellipse(-5, -2, 5, 5);
-                ellipse(5, -2, 5, 5);
-                stroke(0, 180, 255);
+                
+                // Draw shield effect
+                noFill();
+                stroke(255, 215, 0, 150 * pulse);
                 strokeWeight(2);
-                for (let t = -1; t <= 1; t++) {
-                    line(t*6, 8, t*6 + random(-2,2), 18 + random(0,2));
-                }
+                ellipse(0, 0, 35, 35);
+                ellipse(0, 0, 40, 40);
                 noStroke();
-            } else if (enemy.type === 'unclassified') {
-                // Yellow-green alien with three eyes and a jagged mouth
-                fill(200, 220, 0);
-                ellipse(0, 0, 24, 24);
-                fill(0, 255, 0);
-                ellipse(-6, -4, 4, 4);
-                ellipse(0, -7, 4, 4);
-                ellipse(6, -4, 4, 4);
-                fill(0);
-                beginShape();
-                vertex(-6, 7);
-                vertex(-3, 10);
-                vertex(0, 7);
-                vertex(3, 10);
-                vertex(6, 7);
-                endShape();
-            } else if (enemy.type === 'stale') {
-                // Purple bat-like alien with wings
-                fill(120, 0, 180);
-                ellipse(0, 0, 22, 16);
-                fill(180, 0, 255, 180);
-                triangle(-11, 0, -22, 8, -8, 8);
-                triangle(11, 0, 22, 8, 8, 8);
-                fill(255, 255, 255);
-                ellipse(-4, -2, 3, 3);
-                ellipse(4, -2, 3, 3);
-            } else if (enemy.type === 'lineage') {
-                // Magenta tentacled alien with a single red eye
-                fill(200, 0, 120);
-                ellipse(0, 0, 20, 20);
-                stroke(200, 0, 120);
-                strokeWeight(2);
-                for (let t = -1; t <= 1; t++) {
-                    line(t*6, 8, t*6 + random(-2,2), 18 + random(0,2));
-                }
-                noStroke();
-                fill(255, 0, 0);
-                ellipse(0, -3, 6, 6);
-                fill(0);
-                ellipse(0, -3, 2, 2);
-            } else if (enemy.type === 'duplicate') {
-                // Green two-headed alien
-                fill(0, 220, 80);
-                ellipse(-5, 0, 12, 16);
-                ellipse(5, 0, 12, 16);
-                fill(255);
-                ellipse(-5, -4, 3, 3);
-                ellipse(5, -4, 3, 3);
-                fill(255, 0, 0);
-                ellipse(-5, 2, 2, 2);
-                ellipse(5, 2, 2, 2);
-            } else if (enemy.type === 'unapproved') {
-                // Orange spiky alien with angry eyes
-                fill(255, 120, 0);
-                ellipse(0, 0, 22, 22);
-                for (let a = 0; a < TWO_PI; a += PI/5) {
-                    let x1 = cos(a) * 11, y1 = sin(a) * 11;
-                    let x2 = cos(a) * 15, y2 = sin(a) * 15;
-                    stroke(255, 120, 0);
+            } else {
+                // Existing enemy drawing code
+                if (enemy.type === 'pii') {
+                    // Red demon head with horns and glowing yellow eyes
+                    fill(220, 0, 0);
+                    ellipse(0, 0, 28, 28);
+                    fill(255, 255, 0);
+                    ellipse(-7, -4, 6, 8); // left eye
+                    ellipse(7, -4, 6, 8); // right eye
+                    fill(120, 0, 0);
+                    arc(0, 8, 16, 10, 0, PI, CHORD); // mouth
+                    fill(255, 255, 255);
+                    triangle(-10, -14, -4, -18, -2, -8); // left horn
+                    triangle(10, -14, 4, -18, 2, -8); // right horn
+                } else if (enemy.type === 'quality') {
+                    // Gray cyclops blob with a big green eye and fangs
+                    fill(80, 80, 80);
+                    ellipse(0, 0, 30, 24);
+                    fill(0, 255, 0);
+                    ellipse(0, -2, 10, 10); // big eye
+                    fill(0);
+                    ellipse(0, -2, 4, 4); // pupil
+                    fill(255);
+                    triangle(-4, 8, -2, 12, 0, 8); // left fang
+                    triangle(4, 8, 2, 12, 0, 8); // right fang
+                } else if (enemy.type === 'lost') {
+                    // Brown spiky virus with glowing orange core
+                    fill(120, 60, 20);
+                    ellipse(0, 0, 24, 24);
+                    for (let a = 0; a < TWO_PI; a += PI/4) {
+                        let x1 = cos(a) * 12, y1 = sin(a) * 12;
+                        let x2 = cos(a) * 18, y2 = sin(a) * 18;
+                        stroke(120, 60, 20);
+                        strokeWeight(3);
+                        line(x1, y1, x2, y2);
+                    }
+                    noStroke();
+                    fill(255, 140, 0, 180);
+                    ellipse(0, 0, 10, 10);
+                } else if (enemy.type === 'orphan') {
+                    // Blue floating jellyfish with tentacles and glowing eyes
+                    fill(0, 180, 255);
+                    ellipse(0, 0, 26, 18);
+                    fill(255, 255, 255, 200);
+                    ellipse(-5, -2, 5, 5);
+                    ellipse(5, -2, 5, 5);
+                    stroke(0, 180, 255);
                     strokeWeight(2);
-                    line(x1, y1, x2, y2);
+                    for (let t = -1; t <= 1; t++) {
+                        line(t*6, 8, t*6 + random(-2,2), 18 + random(0,2));
+                    }
+                    noStroke();
+                } else if (enemy.type === 'unclassified') {
+                    // Yellow-green alien with three eyes and a jagged mouth
+                    fill(200, 220, 0);
+                    ellipse(0, 0, 24, 24);
+                    fill(0, 255, 0);
+                    ellipse(-6, -4, 4, 4);
+                    ellipse(0, -7, 4, 4);
+                    ellipse(6, -4, 4, 4);
+                    fill(0);
+                    beginShape();
+                    vertex(-6, 7);
+                    vertex(-3, 10);
+                    vertex(0, 7);
+                    vertex(3, 10);
+                    vertex(6, 7);
+                    endShape();
+                } else if (enemy.type === 'stale') {
+                    // Purple bat-like alien with wings
+                    fill(120, 0, 180);
+                    ellipse(0, 0, 22, 16);
+                    fill(180, 0, 255, 180);
+                    triangle(-11, 0, -22, 8, -8, 8);
+                    triangle(11, 0, 22, 8, 8, 8);
+                    fill(255, 255, 255);
+                    ellipse(-4, -2, 3, 3);
+                    ellipse(4, -2, 3, 3);
+                } else if (enemy.type === 'lineage') {
+                    // Magenta tentacled alien with a single red eye
+                    fill(200, 0, 120);
+                    ellipse(0, 0, 20, 20);
+                    stroke(200, 0, 120);
+                    strokeWeight(2);
+                    for (let t = -1; t <= 1; t++) {
+                        line(t*6, 8, t*6 + random(-2,2), 18 + random(0,2));
+                    }
+                    noStroke();
+                    fill(255, 0, 0);
+                    ellipse(0, -3, 6, 6);
+                    fill(0);
+                    ellipse(0, -3, 2, 2);
+                } else if (enemy.type === 'duplicate') {
+                    // Green two-headed alien
+                    fill(0, 220, 80);
+                    ellipse(-5, 0, 12, 16);
+                    ellipse(5, 0, 12, 16);
+                    fill(255);
+                    ellipse(-5, -4, 3, 3);
+                    ellipse(5, -4, 3, 3);
+                    fill(255, 0, 0);
+                    ellipse(-5, 2, 2, 2);
+                    ellipse(5, 2, 2, 2);
+                } else if (enemy.type === 'unapproved') {
+                    // Orange spiky alien with angry eyes
+                    fill(255, 120, 0);
+                    ellipse(0, 0, 22, 22);
+                    for (let a = 0; a < TWO_PI; a += PI/5) {
+                        let x1 = cos(a) * 11, y1 = sin(a) * 11;
+                        let x2 = cos(a) * 15, y2 = sin(a) * 15;
+                        stroke(255, 120, 0);
+                        strokeWeight(2);
+                        line(x1, y1, x2, y2);
+                    }
+                    noStroke();
+                    fill(0);
+                    ellipse(-4, -3, 3, 4);
+                    ellipse(4, -3, 3, 4);
+                    fill(255, 0, 0);
+                    rect(-3, 4, 6, 2, 1);
+                } else if (enemy.type === 'policy') {
+                    // Red skull with glowing eyes
+                    fill(255, 0, 0);
+                    ellipse(0, 0, 22, 22);
+                    fill(255, 255, 0);
+                    ellipse(-5, -3, 4, 4);
+                    ellipse(5, -3, 4, 4);
+                    fill(0);
+                    rect(-6, 4, 12, 4, 2);
+                    rect(-2, 8, 4, 2, 1);
+                } else if (enemy.type === 'uncertified') {
+                    // Blue floating orb with a glowing core and aura
+                    fill(0, 80, 255);
+                    ellipse(0, 0, 20, 20);
+                    fill(0, 200, 255, 120);
+                    ellipse(0, 0, 12, 12);
+                    fill(255, 255, 255, 180);
+                    ellipse(0, 0, 6, 6);
+                } else if (enemy.type === 'unknown') {
+                    // Teal alien with a single big eye and question mark
+                    fill(0, 200, 200);
+                    ellipse(0, 0, 22, 22);
+                    fill(255);
+                    ellipse(0, -3, 7, 7);
+                    fill(0);
+                    ellipse(0, -3, 3, 3);
+                    fill(255, 255, 0);
+                    textSize(14);
+                    text('?', 0, 8);
                 }
-                noStroke();
-                fill(0);
-                ellipse(-4, -3, 3, 4);
-                ellipse(4, -3, 3, 4);
-                fill(255, 0, 0);
-                rect(-3, 4, 6, 2, 1);
-            } else if (enemy.type === 'policy') {
-                // Red skull with glowing eyes
-                fill(255, 0, 0);
-                ellipse(0, 0, 22, 22);
-                fill(255, 255, 0);
-                ellipse(-5, -3, 4, 4);
-                ellipse(5, -3, 4, 4);
-                fill(0);
-                rect(-6, 4, 12, 4, 2);
-                rect(-2, 8, 4, 2, 1);
-            } else if (enemy.type === 'uncertified') {
-                // Blue floating orb with a glowing core and aura
-                fill(0, 80, 255);
-                ellipse(0, 0, 20, 20);
-                fill(0, 200, 255, 120);
-                ellipse(0, 0, 12, 12);
-                fill(255, 255, 255, 180);
-                ellipse(0, 0, 6, 6);
-            } else if (enemy.type === 'unknown') {
-                // Teal alien with a single big eye and question mark
-                fill(0, 200, 200);
-                ellipse(0, 0, 22, 22);
-                fill(255);
-                ellipse(0, -3, 7, 7);
-                fill(0);
-                ellipse(0, -3, 3, 3);
-                fill(255, 255, 0);
-                textSize(14);
-                text('?', 0, 8);
             }
             // Draw label under enemy
             pop();
@@ -866,35 +908,42 @@
         function spawnEnemy() {
             // Only spawn if the number of enemies on screen is less than the number of kills left
             if (enemies.length >= enemiesNeededForWave - enemiesKilled) return;
+            
+            // Check for bonus life enemy spawn
             let typeObj;
-            if (wave === 1) {
-                typeObj = ENEMY_TYPES[0]; // pii
-            } else if (wave === 2) {
-                typeObj = ENEMY_TYPES[1]; // quality
-            } else if (wave === 3) {
-                typeObj = ENEMY_TYPES[2]; // lost
-            } else if (wave === 4) {
-                typeObj = ENEMY_TYPES[3]; // orphan
-            } else if (wave === 5) {
-                typeObj = ENEMY_TYPES[4]; // unclassified
-            } else if (wave === 6) {
-                typeObj = ENEMY_TYPES[5]; // stale
-            } else if (wave === 7) {
-                typeObj = ENEMY_TYPES[6]; // lineage
-            } else if (wave === 8) {
-                typeObj = ENEMY_TYPES[7]; // duplicate
-            } else if (wave === 9) {
-                typeObj = ENEMY_TYPES[8]; // unapproved
-            } else if (wave === 10) {
-                typeObj = ENEMY_TYPES[9]; // policy
-            } else if (wave === 11) {
-                typeObj = ENEMY_TYPES[10]; // uncertified
-            } else if (wave === 12) {
-                typeObj = ENEMY_TYPES[11]; // unknown
+            if (random() < BONUS_LIFE_CHANCE && wave > 2) { // Only spawn bonus enemies after wave 2
+                typeObj = ENEMY_TYPES.find(e => e.type === 'bonus');
             } else {
-                // Mixed waves after 12
-                typeObj = random(ENEMY_TYPES);
+                if (wave === 1) {
+                    typeObj = ENEMY_TYPES[0]; // pii
+                } else if (wave === 2) {
+                    typeObj = ENEMY_TYPES[1]; // quality
+                } else if (wave === 3) {
+                    typeObj = ENEMY_TYPES[2]; // lost
+                } else if (wave === 4) {
+                    typeObj = ENEMY_TYPES[3]; // orphan
+                } else if (wave === 5) {
+                    typeObj = ENEMY_TYPES[4]; // unclassified
+                } else if (wave === 6) {
+                    typeObj = ENEMY_TYPES[5]; // stale
+                } else if (wave === 7) {
+                    typeObj = ENEMY_TYPES[6]; // lineage
+                } else if (wave === 8) {
+                    typeObj = ENEMY_TYPES[7]; // duplicate
+                } else if (wave === 9) {
+                    typeObj = ENEMY_TYPES[8]; // unapproved
+                } else if (wave === 10) {
+                    typeObj = ENEMY_TYPES[9]; // policy
+                } else if (wave === 11) {
+                    typeObj = ENEMY_TYPES[10]; // uncertified
+                } else if (wave === 12) {
+                    typeObj = ENEMY_TYPES[11]; // unknown
+                } else {
+                    // Mixed waves after 12
+                    typeObj = random(ENEMY_TYPES.filter(e => e.type !== 'bonus')); // Exclude bonus from random selection
+                }
             }
+            
             enemies.push({
                 x: random(30, canvasWidth - 30),
                 y: -30,
@@ -902,7 +951,8 @@
                 label: typeObj.label,
                 color: typeObj.color,
                 speed: random(1, 2) + wave * 0.3,
-                points: typeObj.points
+                points: typeObj.points,
+                isBonus: typeObj.isBonus || false
             });
         }
         
@@ -1052,6 +1102,32 @@
                 }
                 playNextVictoryNote();
             } catch (e) { console.log('playVictoryMelody error:', e); }
+        }
+        
+        function playBonusLifeSound() {
+            try {
+                if (!audioContext) {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                // Play an ascending arpeggio
+                const notes = [440, 554.37, 659.25, 880]; // A4, C#5, E5, A5
+                let time = audioContext.currentTime;
+                
+                notes.forEach((freq, i) => {
+                    oscillator.frequency.setValueAtTime(freq, time + i * 0.1);
+                    gainNode.gain.setValueAtTime(SOUND_EFFECTS_VOLUME, time + i * 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, time + i * 0.1 + 0.1);
+                });
+                
+                oscillator.type = 'sine';
+                oscillator.start(time);
+                oscillator.stop(time + 0.5);
+            } catch (e) { console.log('playBonusLifeSound error:', e); }
         }
         
         function setupControls() {
