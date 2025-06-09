@@ -63,6 +63,10 @@
             cursor: pointer;
             pointer-events: auto;
         }
+        /* Add spacing control for right button */
+        .btn#rightBtn {
+            margin-left: -60px; /* Adjust this value to move right button closer to left (-40px = closer, 0px = default spacing) */
+        }
         .btn:active {
             background: rgba(0, 150, 255, 1);
             transform: scale(0.95);
@@ -172,11 +176,11 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.2.3'; // Increased background music volume
+        const GAME_VERSION = '1.2.4'; // Increased background music volume
 
         // --- Volume Control ---
-        const BACKGROUND_MUSIC_VOLUME = 0.9;  // Volume for background music (0.0 to 1.0)
-        const SOUND_EFFECTS_VOLUME = 0.2;      // Volume for all other sound effects (0.0 to 1.0)
+        const BACKGROUND_MUSIC_VOLUME = 0.7;  // Volume for background music (0.0 to 1.0)
+        const SOUND_EFFECTS_VOLUME = 0.4;      // Volume for all other sound effects (0.0 to 1.0)
 
         // --- Player Settings ---
         const PLAYER_START_LIVES = 3; // Number of lives per game
