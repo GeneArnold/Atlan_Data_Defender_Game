@@ -208,6 +208,7 @@
         const ENEMY_MIN_X = 30;       // Min X for enemy spawn
         const ENEMY_MAX_X_OFFSET = 30;// Max X offset for enemy spawn
         const BONUS_LIFE_CHANCE = 0.05; // 5% chance for bonus life enemy to spawn
+        const BONUS_LIFE_COOLDOWN = 300; // Frames between possible bonus life spawns
 
         // --- Wave Announcement & Game Over ---
         const WAVE_ANNOUNCE_FRAMES = 180; // Frames to show wave announcement
@@ -249,6 +250,7 @@
         let enemiesNeededForWave = 25;
         let hitTimer = 0;
         let explosions = [];
+        let bonusLifeCooldown = 0; // Track cooldown for bonus life spawns
         // --- Music globals ---
         let melodyIndex = 0;
         let melodyTempo = MUSIC_TEMPO_BASE;
@@ -356,6 +358,11 @@
                     y: player.y - 10,
                     speed: 8
                 });
+            }
+            
+            // Update bonus life cooldown
+            if (bonusLifeCooldown > 0) {
+                bonusLifeCooldown--;
             }
             
             // Update bullets
@@ -911,8 +918,9 @@
             
             // Check for bonus life enemy spawn
             let typeObj;
-            if (random() < BONUS_LIFE_CHANCE && wave > 2) { // Only spawn bonus enemies after wave 2
+            if (random() < BONUS_LIFE_CHANCE && wave > 2 && bonusLifeCooldown <= 0) {
                 typeObj = ENEMY_TYPES.find(e => e.type === 'bonus');
+                bonusLifeCooldown = BONUS_LIFE_COOLDOWN; // Set cooldown when spawning bonus enemy
             } else {
                 if (wave === 1) {
                     typeObj = ENEMY_TYPES[0]; // pii
