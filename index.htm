@@ -176,7 +176,7 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.3.7'; // Complete rewrite of bonus life system
+        const GAME_VERSION = '1.3.8'; // Reduced bonus life spawn chance to 2%
 
         // --- Volume Control ---
         const BACKGROUND_MUSIC_VOLUME = 0.7;  // Volume for background music (0.0 to 1.0)
@@ -207,7 +207,7 @@
         const ENEMY_START_Y = -30;    // Y position where enemies spawn
         const ENEMY_MIN_X = 30;       // Min X for enemy spawn
         const ENEMY_MAX_X_OFFSET = 30;// Max X offset for enemy spawn
-        const BONUS_LIFE_CHANCE = 0.05; // 5% chance for bonus life enemy to spawn
+        const BONUS_LIFE_CHANCE = 0.02; // 2% chance for bonus life enemy to spawn (reduced from 5%)
         const BONUS_LIFE_SPEED = 2;   // Speed of bonus life enemy
         const BONUS_LIFE_DESPAWN_Y = 50; // Y position where bonus life enemy despawns
 
@@ -251,7 +251,6 @@
         let enemiesNeededForWave = 25;
         let hitTimer = 0;
         let explosions = [];
-        let bonusLifeCooldown = 0; // Track cooldown for bonus life spawns
         let bonusLifeActive = false; // Track if a bonus life enemy is currently on screen
         // --- Music globals ---
         let melodyIndex = 0;
@@ -360,11 +359,6 @@
                     y: player.y - 10,
                     speed: 8
                 });
-            }
-            
-            // Update bonus life cooldown
-            if (bonusLifeCooldown > 0) {
-                bonusLifeCooldown--;
             }
             
             // Update bullets
