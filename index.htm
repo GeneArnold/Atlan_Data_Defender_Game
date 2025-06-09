@@ -172,7 +172,11 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.2.2'; // Music fix: restore missing melody globals
+        const GAME_VERSION = '1.2.3'; // Increased background music volume
+
+        // --- Volume Control ---
+        const BACKGROUND_MUSIC_VOLUME = 0.9;  // Volume for background music (0.0 to 1.0)
+        const SOUND_EFFECTS_VOLUME = 0.2;      // Volume for all other sound effects (0.0 to 1.0)
 
         // --- Player Settings ---
         const PLAYER_START_LIVES = 3; // Number of lives per game
@@ -969,7 +973,7 @@
                 gainNode.connect(audioContext.destination);
                 oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
                 oscillator.type = 'sawtooth'; // darker, more ominous
-                gainNode.gain.setValueAtTime(0.025, audioContext.currentTime); // slightly lower volume
+                gainNode.gain.setValueAtTime(BACKGROUND_MUSIC_VOLUME, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.18);
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.18);
@@ -988,7 +992,7 @@
                 gainNode.connect(audioContext.destination);
                 oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
                 oscillator.frequency.exponentialRampToValueAtTime(200, audioContext.currentTime + 0.1);
-                gainNode.gain.setValueAtTime(0.07, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(SOUND_EFFECTS_VOLUME, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
                 oscillator.type = 'triangle';
                 oscillator.start(audioContext.currentTime);
@@ -1007,7 +1011,7 @@
                 gainNode.connect(audioContext.destination);
                 oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
                 oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.4);
-                gainNode.gain.setValueAtTime(0.09, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(SOUND_EFFECTS_VOLUME, audioContext.currentTime);
                 gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
                 oscillator.type = 'triangle';
                 oscillator.start(audioContext.currentTime);
@@ -1035,7 +1039,7 @@
                     gainNode.connect(audioContext.destination);
                     oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
                     oscillator.type = 'triangle'; // still a bit dark
-                    gainNode.gain.setValueAtTime(0.045, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(BACKGROUND_MUSIC_VOLUME, audioContext.currentTime);
                     gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.22);
                     oscillator.start(audioContext.currentTime);
                     oscillator.stop(audioContext.currentTime + 0.22);
