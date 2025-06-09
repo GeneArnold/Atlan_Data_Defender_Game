@@ -176,7 +176,7 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.3.6'; // Fixed bonus life cooldown enforcement
+        const GAME_VERSION = '1.3.7'; // Complete rewrite of bonus life system
 
         // --- Volume Control ---
         const BACKGROUND_MUSIC_VOLUME = 0.7;  // Volume for background music (0.0 to 1.0)
@@ -208,7 +208,6 @@
         const ENEMY_MIN_X = 30;       // Min X for enemy spawn
         const ENEMY_MAX_X_OFFSET = 30;// Max X offset for enemy spawn
         const BONUS_LIFE_CHANCE = 0.05; // 5% chance for bonus life enemy to spawn
-        const BONUS_LIFE_COOLDOWN = 600; // Frames between possible bonus life spawns (10 seconds)
         const BONUS_LIFE_SPEED = 2;   // Speed of bonus life enemy
         const BONUS_LIFE_DESPAWN_Y = 50; // Y position where bonus life enemy despawns
 
@@ -929,9 +928,8 @@
             
             // Check for bonus life enemy spawn
             let typeObj;
-            if (random() < BONUS_LIFE_CHANCE && wave > 2 && bonusLifeCooldown <= 0 && !bonusLifeActive) {
+            if (wave > 1 && !bonusLifeActive && random() < BONUS_LIFE_CHANCE) {
                 typeObj = ENEMY_TYPES.find(e => e.type === 'bonus');
-                bonusLifeCooldown = BONUS_LIFE_COOLDOWN; // Set cooldown when spawning bonus enemy
                 bonusLifeActive = true; // Mark that a bonus enemy is active
             } else {
                 if (wave === 1) {
