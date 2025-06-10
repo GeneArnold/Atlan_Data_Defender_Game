@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <!-- Main body -->
+    <path d="M32 8 L48 20 L48 44 L32 56 L16 44 L16 20 Z" fill="#0096FF"/>
+    
+    <!-- Cockpit -->
+    <path d="M28 20 L36 20 L34 32 L30 32 Z" fill="#FFFFFF"/>
+    
+    <!-- Left wing -->
+    <path d="M16 32 L8 36 L16 40 Z" fill="#0064C8"/>
+    
+    <!-- Right wing -->
+    <path d="M48 32 L56 36 L48 40 Z" fill="#0064C8"/>
+    
+    <!-- Engines -->
+    <rect x="26" y="40" width="4" height="8" fill="#FF6400"/>
+    <rect x="34" y="40" width="4" height="8" fill="#FF6400"/>
+    
+    <!-- Engine glow -->
+    <rect x="26" y="48" width="4" height="4" fill="#FFC800" opacity="0.8"/>
+    <rect x="34" y="48" width="4" height="4" fill="#FFC800" opacity="0.8"/>
+</svg> 
