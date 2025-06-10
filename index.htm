@@ -177,7 +177,7 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.3.11'; // Added debugging for bonus life system
+        const GAME_VERSION = '1.3.12'; // Added detailed spawn test debugging
 
         // --- Volume Control ---
         const BACKGROUND_MUSIC_VOLUME = 0.7;  // Volume for background music (0.0 to 1.0)
@@ -255,6 +255,9 @@
         let bonusLifeActive = false; // Track if a bonus life enemy is currently on screen
         let bonusLifeSpawnCount = 0; // Track total number of bonus life ships spawned
         let debugMode = true; // Enable debugging display
+        let lastRandomValue = 0; // Track the last random value
+        let lastSpawnTest = false; // Track the last spawn test result
+        let spawnTestCount = 0; // Count how many times we've tested for spawn
         // --- Music globals ---
         let melodyIndex = 0;
         let melodyTempo = MUSIC_TEMPO_BASE;
@@ -925,6 +928,9 @@
                 text(`Bonus Life Spawn Chance: ${(BONUS_LIFE_CHANCE * 100).toFixed(1)}%`, 10, 140);
                 text(`Bonus Life Ships Spawned: ${bonusLifeSpawnCount}`, 10, 155);
                 text(`Current Wave: ${wave}`, 10, 170);
+                text(`Last Random Value: ${lastRandomValue.toFixed(3)}`, 10, 185);
+                text(`Last Spawn Test: ${lastSpawnTest}`, 10, 200);
+                text(`Total Spawn Tests: ${spawnTestCount}`, 10, 215);
             }
         }
         
@@ -934,11 +940,48 @@
             
             // Check for bonus life enemy spawn
             let typeObj;
-            if (wave > 1 && !bonusLifeActive && random() < BONUS_LIFE_CHANCE) {
-                typeObj = ENEMY_TYPES.find(e => e.type === 'bonus');
-                bonusLifeActive = true; // Mark that a bonus enemy is active
-                bonusLifeSpawnCount++; // Increment spawn counter
+            if (wave > 1 && !bonusLifeActive) {
+                spawnTestCount++; // Increment test counter
+                lastRandomValue = random(); // Store the random value
+                lastSpawnTest = lastRandomValue < BONUS_LIFE_CHANCE; // Store the test result
+                
+                if (lastSpawnTest) {
+                    typeObj = ENEMY_TYPES.find(e => e.type === 'bonus');
+                    bonusLifeActive = true; // Mark that a bonus enemy is active
+                    bonusLifeSpawnCount++; // Increment spawn counter
+                } else {
+                    // Regular enemy spawn logic
+                    if (wave === 1) {
+                        typeObj = ENEMY_TYPES[0]; // pii
+                    } else if (wave === 2) {
+                        typeObj = ENEMY_TYPES[1]; // quality
+                    } else if (wave === 3) {
+                        typeObj = ENEMY_TYPES[2]; // lost
+                    } else if (wave === 4) {
+                        typeObj = ENEMY_TYPES[3]; // orphan
+                    } else if (wave === 5) {
+                        typeObj = ENEMY_TYPES[4]; // unclassified
+                    } else if (wave === 6) {
+                        typeObj = ENEMY_TYPES[5]; // stale
+                    } else if (wave === 7) {
+                        typeObj = ENEMY_TYPES[6]; // lineage
+                    } else if (wave === 8) {
+                        typeObj = ENEMY_TYPES[7]; // duplicate
+                    } else if (wave === 9) {
+                        typeObj = ENEMY_TYPES[8]; // unapproved
+                    } else if (wave === 10) {
+                        typeObj = ENEMY_TYPES[9]; // policy
+                    } else if (wave === 11) {
+                        typeObj = ENEMY_TYPES[10]; // uncertified
+                    } else if (wave === 12) {
+                        typeObj = ENEMY_TYPES[11]; // unknown
+                    } else {
+                        // Mixed waves after 12
+                        typeObj = random(ENEMY_TYPES.filter(e => e.type !== 'bonus')); // Exclude bonus from random selection
+                    }
+                }
             } else {
+                // Regular enemy spawn logic (when wave <= 1 or bonus life is active)
                 if (wave === 1) {
                     typeObj = ENEMY_TYPES[0]; // pii
                 } else if (wave === 2) {
