@@ -177,7 +177,7 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.3.12'; // Added detailed spawn test debugging
+        const GAME_VERSION = '1.3.13'; // Added wave-based bonus life spawn chance adjustment
 
         // --- Volume Control ---
         const BACKGROUND_MUSIC_VOLUME = 0.7;  // Volume for background music (0.0 to 1.0)
@@ -208,7 +208,7 @@
         const ENEMY_START_Y = -30;    // Y position where enemies spawn
         const ENEMY_MIN_X = 30;       // Min X for enemy spawn
         const ENEMY_MAX_X_OFFSET = 30;// Max X offset for enemy spawn
-        const BONUS_LIFE_CHANCE = 0.02; // 2% chance for bonus life enemy to spawn (reduced from 5%)
+        const BONUS_LIFE_BASE_CHANCE = 0.02; // Base 2% chance for bonus life enemy to spawn
         const BONUS_LIFE_SPEED = 2;   // Speed of bonus life enemy
         const BONUS_LIFE_DESPAWN_Y = 50; // Y position where bonus life enemy despawns
 
@@ -925,12 +925,13 @@
                 textSize(12);
                 text(`Debug Info:`, 10, 110);
                 text(`Bonus Life Active: ${bonusLifeActive}`, 10, 125);
-                text(`Bonus Life Spawn Chance: ${(BONUS_LIFE_CHANCE * 100).toFixed(1)}%`, 10, 140);
-                text(`Bonus Life Ships Spawned: ${bonusLifeSpawnCount}`, 10, 155);
-                text(`Current Wave: ${wave}`, 10, 170);
-                text(`Last Random Value: ${lastRandomValue.toFixed(3)}`, 10, 185);
-                text(`Last Spawn Test: ${lastSpawnTest}`, 10, 200);
-                text(`Total Spawn Tests: ${spawnTestCount}`, 10, 215);
+                text(`Base Spawn Chance: ${(BONUS_LIFE_BASE_CHANCE * 100).toFixed(1)}%`, 10, 140);
+                text(`Adjusted Chance: ${((BONUS_LIFE_BASE_CHANCE / (wave - 1)) * 100).toFixed(1)}%`, 10, 155);
+                text(`Bonus Life Ships Spawned: ${bonusLifeSpawnCount}`, 10, 170);
+                text(`Current Wave: ${wave}`, 10, 185);
+                text(`Last Random Value: ${lastRandomValue.toFixed(3)}`, 10, 200);
+                text(`Last Spawn Test: ${lastSpawnTest}`, 10, 215);
+                text(`Total Spawn Tests: ${spawnTestCount}`, 10, 230);
             }
         }
         
@@ -943,7 +944,9 @@
             if (wave > 1 && !bonusLifeActive) {
                 spawnTestCount++; // Increment test counter
                 lastRandomValue = random(); // Store the random value
-                lastSpawnTest = lastRandomValue < BONUS_LIFE_CHANCE; // Store the test result
+                // Adjust chance based on wave level
+                let adjustedChance = BONUS_LIFE_BASE_CHANCE / (wave - 1);
+                lastSpawnTest = lastRandomValue < adjustedChance; // Store the test result
                 
                 if (lastSpawnTest) {
                     typeObj = ENEMY_TYPES.find(e => e.type === 'bonus');
