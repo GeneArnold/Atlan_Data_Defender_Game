@@ -177,7 +177,7 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.3.10'; // Added favicon
+        const GAME_VERSION = '1.3.11'; // Added debugging for bonus life system
 
         // --- Volume Control ---
         const BACKGROUND_MUSIC_VOLUME = 0.7;  // Volume for background music (0.0 to 1.0)
@@ -253,6 +253,8 @@
         let hitTimer = 0;
         let explosions = [];
         let bonusLifeActive = false; // Track if a bonus life enemy is currently on screen
+        let bonusLifeSpawnCount = 0; // Track total number of bonus life ships spawned
+        let debugMode = true; // Enable debugging display
         // --- Music globals ---
         let melodyIndex = 0;
         let melodyTempo = MUSIC_TEMPO_BASE;
@@ -913,6 +915,17 @@
             fill(255, 255, 0);
             textSize(12);
             text(`Enemies left: ${remaining}`, 10, 85);
+
+            // Debug information
+            if (debugMode) {
+                fill(0, 255, 0);
+                textSize(12);
+                text(`Debug Info:`, 10, 110);
+                text(`Bonus Life Active: ${bonusLifeActive}`, 10, 125);
+                text(`Bonus Life Spawn Chance: ${(BONUS_LIFE_CHANCE * 100).toFixed(1)}%`, 10, 140);
+                text(`Bonus Life Ships Spawned: ${bonusLifeSpawnCount}`, 10, 155);
+                text(`Current Wave: ${wave}`, 10, 170);
+            }
         }
         
         function spawnEnemy() {
@@ -924,6 +937,7 @@
             if (wave > 1 && !bonusLifeActive && random() < BONUS_LIFE_CHANCE) {
                 typeObj = ENEMY_TYPES.find(e => e.type === 'bonus');
                 bonusLifeActive = true; // Mark that a bonus enemy is active
+                bonusLifeSpawnCount++; // Increment spawn counter
             } else {
                 if (wave === 1) {
                     typeObj = ENEMY_TYPES[0]; // pii
