@@ -177,7 +177,7 @@
     <script>
         // === GLOBAL GAME CONSTANTS ===
         // Versioning
-        const GAME_VERSION = '1.3.13'; // Added wave-based bonus life spawn chance adjustment
+        const GAME_VERSION = '1.3.14'; // Added wave-based bonus life spawn chance adjustment
 
         // --- Volume Control ---
         const BACKGROUND_MUSIC_VOLUME = 0.7;  // Volume for background music (0.0 to 1.0)
@@ -208,8 +208,8 @@
         const ENEMY_START_Y = -30;    // Y position where enemies spawn
         const ENEMY_MIN_X = 30;       // Min X for enemy spawn
         const ENEMY_MAX_X_OFFSET = 30;// Max X offset for enemy spawn
-        const BONUS_LIFE_BASE_CHANCE = 0.02; // Base 2% chance for bonus life enemy to spawn
-        const BONUS_LIFE_SPEED = 2;   // Speed of bonus life enemy
+        const BONUS_LIFE_BASE_CHANCE = 0.04; // Base 2% chance for bonus life enemy to spawn
+        const BONUS_LIFE_SPEED = 3;   // Speed of bonus life enemy
         const BONUS_LIFE_DESPAWN_Y = 50; // Y position where bonus life enemy despawns
 
         // --- Wave Announcement & Game Over ---
@@ -254,7 +254,7 @@
         let explosions = [];
         let bonusLifeActive = false; // Track if a bonus life enemy is currently on screen
         let bonusLifeSpawnCount = 0; // Track total number of bonus life ships spawned
-        let debugMode = true; // Enable debugging display
+        let debugMode = false; // Enable debugging display
         let lastRandomValue = 0; // Track the last random value
         let lastSpawnTest = false; // Track the last spawn test result
         let spawnTestCount = 0; // Count how many times we've tested for spawn
